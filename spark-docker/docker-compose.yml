@@ -1,0 +1,53 @@
+version: '3'
+
+services:
+  master:
+    image: pfmuah/spark-master:2.4.5-java8
+    container_name: master
+    hostname: master
+    restart: always
+    ports:
+      - "4040:4040"
+      - "6066:6066"
+      - "7077:7077"
+      - "8080:8080"
+      - "18080:18080"
+    volumes:
+      - master_conf_vol:/opt/spark/conf
+      - master_data_vol:/tmp/data
+    environment:
+      - MASTER=spark://master:7077
+      - SPARK_CONF_DIR=/opt/spark/conf
+          
+  worker:
+    image: pfmuah/spark-worker:2.4.5-java8
+    container_name: worker
+    hostname: worker
+    restart: always
+    ports:
+      - "8081:8081"
+      - "8881:8881"
+    volumes:
+      - worker_conf_vol:/opt/spark/conf
+      - worker_data_vol:/tmp/data  
+    environment:
+     - SPARK_CONF_DIR=/opt/spark/conf
+     - SPARK_WORKER_MEMORY=1g
+     - SPARK_WORKER_CORES=1
+     - SPARK_WORKER_PORT=8881
+     - SPARK_WORKER_WEBUI_PORT=8081
+     
+    links:
+     - master
+    depends_on:
+     - master     
+volumes:
+  master_conf_vol:
+  master_data_vol:
+  worker_conf_vol:
+  worker_data_vol:
+
+networks:
+  default:
+    external:
+      name: test-net

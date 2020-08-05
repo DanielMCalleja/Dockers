@@ -1,0 +1,32 @@
+version: '3'
+
+services:
+  mongodb:
+    image: pfmuah/mongodb-base:4.6-java8
+    container_name: mongodb
+    hostname: mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - /opt/docker_volumes/mongodb:/data/db
+   
+
+  mongobi:
+    image: pfmuah/mongodb-bi-base:2.13.4
+    container_name: mongobi
+    hostname: mongobi
+    restart: always
+    ports:
+      - "3307:3307"
+    volumes:
+      - /opt/docker_volumes/mongobi/logs:/data/logs
+    links:
+      - mongodb
+    depends_on:
+      - mongodb
+
+networks:
+  default:
+   external:
+     name: test-net

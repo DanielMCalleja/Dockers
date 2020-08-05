@@ -1,0 +1,48 @@
+version: '3'
+
+services:
+  zookeeper:
+    image: pfmuah/kafka-zookeeper:2.12_2.5.0-java8
+    container_name: zookeeper
+    restart: always
+    ports:
+      - "2181:2181"
+    volumes:
+      - zookeeper_vol:/tmp/zookeeper
+    environment:
+      - ZOOKEEPER_LOG=/tmp/zookeeper
+      - ZOOKEEPER_CLIENT_PORT=2181
+      - ZOOKEEPER_TICK_TIME=2000
+     
+  kafka:
+    image: pfmuah/kafka-broker:2.12_2.5.0-java8
+    container_name: kafka
+    hostname: kafka
+    restart: always
+    ports:
+      - "9092:9092"
+    volumes:
+      - kafka_vol:/tmp/kafka-logs
+    environment:
+      - KAFKA_LOG=/tmp/kafka-logs
+      - SERVICE_PRECONDITION=zookeeper:2181
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_LISTENERS=PLAINTEXT://0.0.0.0:9092
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+      - KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS=0
+      - KAFKA_DELETE_TOPIC_ENABLE=true
+    links:
+      - zookeeper
+    depends_on:
+      - zookeeper
+    
+
+volumes:
+  zookeeper_vol:
+  kafka_vol:
+    
+networks:
+  default:
+    external:
+      name: test-net

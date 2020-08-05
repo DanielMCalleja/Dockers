@@ -1,0 +1,20 @@
+version: '3'
+
+services:
+  hadoop-cluster:
+    image: pfmuah/hadoop-base:3.2.1-java8
+    container_name: hadoop-cluster
+    hostname: hadoop-cluster
+    restart: always
+    ports:
+      - "9870:9870"
+      - "9864:9864"
+      - "9866:9866"
+    volumes:
+      - /opt/docker_volumes/hadoop_store/hdfs_namenode:/hadoop-cluster/hadoop_store/hdfs/namenode
+      - /opt/docker_volumes/hadoop_store/hdfs_datanode:/hadoop-cluster/hadoop_store/hdfs/datanode
+   
+networks:
+  default:
+    external:
+      name: test-net
